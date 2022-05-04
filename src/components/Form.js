@@ -1,59 +1,44 @@
 import {useState} from 'react';
-
+import db from '../firebase';
 
 function Form() {
-const [person , setPerson] = useState({
-    name: "",
-    url: ""
-});
+const [name , setName] = useState("");
+const [url , setUrl] = useState("");
 
-let name,value;
-const postData =(e) => {
-        name = e.target.name;
-        value = e.target.value;
-
-        setPerson({...person, [name]: value});
-}
-
-const submitData = async (event) => {
+const submitData = (event) => {
     event.preventDefault();
-    const {name , url} = person;
-    const res = await fetch(
-        'https://tinder-weekend-clone-1f406-default-rtdb.asia-southeast1.firebasedatabase.app/personDataRecord.json', 
-        {
+    if(name && url){
 
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-             },
-             body:JSON.stringify({
-                name ,
-                url
-             })
+        const data = db.collection("people").add({
+            name: name,
+            url: url,
+          });
+    
+          if(data){
+            setName("");
+            setUrl("");
+            alert("Data Stored");
         } 
-    )
-	if(res){
-        setPerson({
-            name: "",
-            url: ""
-        });
-        alert("Data Stored");
-    } 
+        else{
+            alert("please fill the data");
+        }
+    }
     else{
         alert("please fill the data");
     }
+    
 }
 
 return (
     <form method='POST'>
         <div className="form" style={{marginTop : 250}}>
             <center>
-            <input placeholder="Enter your name" name="name" value={person.name}
-            onChange={postData}/>
+            <input placeholder="Enter your name" name="name" value={name}
+            onChange={(e) => setName(e.target.value)}/>
             <br/><br/>
-            <input placeholder="Paste the URL" name="url" value={person.url}
-            onChange={postData}/>
-            <br/><br/>
+            <input placeholder="Paste the URL" name="url" value={url}
+            onChange={(e) => setUrl(e.target.value)}/>
+            <br/><br/>   
             <button onClick={submitData}>PUSH</button>
             </center>
         </div>
